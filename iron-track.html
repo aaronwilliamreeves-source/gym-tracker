@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Iron Track">
+    <title>Iron Track - Gym Progress Tracker</title>
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIklyb24gVHJhY2siLAogICJzaG9ydF9uYW1lIjogIklyb25UcmFjayIsCiAgImRlc2NyaXB0aW9uIjogIlBlcnNvbmFsIGd5bSBwcm9ncmVzcyB0cmFja2VyIiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMwYTBhMGEiLAogICJ0aGVtZV9jb2xvciI6ICIjMGEwYTBhIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJyUzRSUzQ3JlY3Qgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIGZpbGw9JyUyM0ZGNEQwMCcvJTNFJTNDdGV4dCB4PSc1MCcgeT0nNTUnIGZvbnQtc2l6ZT0nNDAnIGZvbnQtd2VpZ2h0PSdib2xkJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPSclMjMwYTBhMGEnJTNFSSUzQy90ZXh0JTNFJTNDL3N2ZyUzRSIsCiAgICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0sCiAgICB7CiAgICAgICJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sLCUzQ3N2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAxMDAgMTAwJyUzRSUzQ3JlY3Qgd2lkdGg9JzEwMCcgaGVpZ2h0PScxMDAnIGZpbGw9JyUyM0ZGNEQwMCcvJTNFJTNDdGV4dCB4PSc1MCcgeT0nNTUnIGZvbnQtc2l6ZT0nNDAnIGZvbnQtd2VpZ2h0PSdib2xkJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPSclMjMwYTBhMGEnJTNFSSUzQy90ZXh0JTNFJTNDL3N2ZyUzRSIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIKICAgIH0KICBdCn0=">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00F0FF;
+            --secondary: #FF00FF;
+            --accent: #00FF88;
+            --warning: #FFFF00;
+            --bg-dark: #0a0014;
+            --bg-darker: #050008;
+            --text: #E0E0FF;
+            --text-dim: #8888AA;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glow-cyan: rgba(0, 240, 255, 0.5);
+            --glow-magenta: rgba(255, 0, 255, 0.5);
+            --glow-green: rgba(0, 255, 136, 0.5);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes neonGlow {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 10px var(--primary),
+                    0 0 20px var(--primary),
+                    0 0 30px var(--primary);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 20px var(--primary),
+                    0 0 40px var(--primary),
+                    0 0 60px var(--primary);
+            }
+        }
+
+        @keyframes gridScroll {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 50px; }
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-darker);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.1) 0%, transparent 50%),
+                linear-gradient(180deg, transparent 0%, rgba(0, 255, 136, 0.05) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+            animation: gridScroll 20s linear infinite;
+        }
+
+        #app {
+            min-height: 100vh;
+            padding-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-header {
+            background: rgba(10, 0, 20, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .app-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            animation: neonGlow 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px var(--glow-cyan));
+        }
+
+        .app-subtitle {
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--glow-cyan);
+        }
+
+        .container {
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.1), transparent);
+            transition: left 0.7s ease;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 
+                0 12px 48px rgba(0, 240, 255, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid;
+            border-image: linear-gradient(90deg, var(--primary), transparent) 1;
+            text-shadow: 0 0 20px var(--glow-cyan);
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--bg-darker);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 20px var(--glow-cyan),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            box-shadow: 
+                0 0 40px var(--glow-cyan),
+                0 0 60px var(--glow-magenta),
+                0 8px 24px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: 
+                inset 0 0 20px var(--glow-cyan),
+                0 0 20px var(--glow-cyan);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--secondary);
+            color: var(--secondary);
+            box-shadow: 
+                inset 0 0 30px var(--glow-magenta),
+                0 0 40px var(--glow-magenta);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            width: auto;
+            margin: 0;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.875rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                inset 0 2px 8px rgba(0, 0, 0, 0.2),
+                0 0 20px var(--glow-cyan);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--glow-cyan) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .stat-card:hover::after {
+            opacity: 0.15;
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 
+                0 12px 48px rgba(0, 240, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px var(--glow-cyan);
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .exercise-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .exercise-item {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .exercise-item:hover {
+            border-color: var(--primary);
+            background: rgba(0, 240, 255, 0.08);
+            box-shadow: 
+                0 8px 24px rgba(0, 240, 255, 0.3),
+                inset 0 0 20px var(--glow-cyan);
+            transform: translateX(4px);
+        }
+
+        .exercise-name {
+            font-weight: 600;
+            color: var(--text);
+            text-shadow: 0 0 10px var(--glow-cyan);
+        }
+
+        .exercise-category {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .set-entry {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 0.75rem;
+            align-items: center;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .set-input {
+            margin: 0;
+        }
+
+        .timer-display {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid var(--glass-border);
+            border-radius: 16px;
+            margin: 1rem 0;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 0 30px var(--glow-cyan);
+        }
+
+        .timer-display.active {
+            border-color: var(--accent);
+            animation: timerPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes timerPulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 8px 32px rgba(0, 255, 136, 0.4),
+                    inset 0 0 30px var(--glow-green);
+            }
+            50% { 
+                box-shadow: 
+                    0 8px 48px rgba(0, 255, 136, 0.8),
+                    0 0 60px var(--glow-green),
+                    inset 0 0 50px var(--glow-green);
+            }
+        }
+
+        .workout-session {
+            position: sticky;
+            top: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 2px solid var(--primary);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            z-index: 50;
+            box-shadow: 
+                0 12px 48px var(--glow-cyan),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .session-time {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px var(--glow-green);
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .history-item:hover {
+            border-left-width: 8px;
+            background: rgba(0, 240, 255, 0.08);
+            box-shadow: 
+                0 8px 32px rgba(0, 240, 255, 0.3),
+                inset 0 0 20px var(--glow-cyan);
+            transform: translateX(4px);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .history-title {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .history-date {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .history-exercises {
+            display: grid;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .history-exercise {
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-dim);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+            filter: drop-shadow(0 0 20px var(--glow-cyan));
+        }
+
+        .chart-container {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+        }
+
+        .pr-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .pr-item {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.2),
+                inset 0 0 20px var(--glow-green);
+            transition: all 0.3s ease;
+        }
+
+        .pr-item:hover {
+            transform: translateX(4px);
+            box-shadow: 
+                0 8px 32px rgba(0, 255, 136, 0.4),
+                inset 0 0 30px var(--glow-green);
+        }
+
+        .pr-exercise {
+            font-weight: 600;
+        }
+
+        .pr-weight {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px var(--glow-green);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 0, 20, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.75rem;
+            z-index: 1000;
+            box-shadow: 
+                0 -8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.5rem;
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary);
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: inset 0 0 20px var(--glow-cyan);
+        }
+
+        .bottom-nav-item:hover {
+            color: var(--primary);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        .bottom-nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+            filter: drop-shadow(0 0 8px var(--glow-cyan));
+        }
+
+        .search-box {
+            margin-bottom: 1rem;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            scrollbar-width: none;
+        }
+
+        .category-filter::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            padding: 0.6rem 1.2rem;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .category-chip.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--bg-darker);
+            border-color: transparent;
+            box-shadow: 
+                0 0 20px var(--glow-cyan),
+                0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .category-chip:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(0, 240, 255, 0.3),
+                inset 0 0 10px var(--glow-cyan);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: 2.2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .set-entry {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 240, 255, 0.3);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 240, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="app-header">
+            <div class="app-title">IRON TRACK</div>
+            <div class="app-subtitle">Personal Gym Tracker</div>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="bottom-nav-item active" data-tab="dashboard">
+                <div class="bottom-nav-icon">📊</div>
+                <div>Dashboard</div>
+            </button>
+            <button class="bottom-nav-item" data-tab="workout">
+                <div class="bottom-nav-icon">💪</div>
+                <div>Workout</div>
+            </button>
+            <button class="bottom-nav-item" data-tab="history">
+                <div class="bottom-nav-icon">📅</div>
+                <div>History</div>
+            </button>
+            <button class="bottom-nav-item" data-tab="progress">
+                <div class="bottom-nav-icon">📈</div>
+                <div>Progress</div>
+            </button>
+        </div>
+
+        <div class="container" id="content"></div>
+    </div>
+
+    <script>
+        // IndexedDB Setup
+        const DB_NAME = 'IronTrackDB';
+        const DB_VERSION = 1;
+
+        let db;
+        let activeTab = 'dashboard';
+        let workouts = [];
+        let exercises = [];
+        let activeWorkout = null;
+        let workoutTimer = 0;
+        let restTimer = 0;
+        let isResting = false;
+        let timerInterval = null;
+        let restInterval = null;
+
+        // Pre-populated exercises
+        const DEFAULT_EXERCISES = [
+            // Push
+            { name: 'Bench Press', category: 'Push', muscleGroup: 'Chest' },
+            { name: 'Incline Bench Press', category: 'Push', muscleGroup: 'Chest' },
+            { name: 'Dumbbell Press', category: 'Push', muscleGroup: 'Chest' },
+            { name: 'Chest Fly', category: 'Push', muscleGroup: 'Chest' },
+            { name: 'Overhead Press', category: 'Push', muscleGroup: 'Shoulders' },
+            { name: 'Lateral Raise', category: 'Push', muscleGroup: 'Shoulders' },
+            { name: 'Front Raise', category: 'Push', muscleGroup: 'Shoulders' },
+            { name: 'Tricep Pushdown', category: 'Push', muscleGroup: 'Triceps' },
+            { name: 'Skull Crushers', category: 'Push', muscleGroup: 'Triceps' },
+            { name: 'Dips', category: 'Push', muscleGroup: 'Triceps' },
+            
+            // Pull
+            { name: 'Deadlift', category: 'Pull', muscleGroup: 'Back' },
+            { name: 'Barbell Row', category: 'Pull', muscleGroup: 'Back' },
+            { name: 'Pull-ups', category: 'Pull', muscleGroup: 'Back' },
+            { name: 'Lat Pulldown', category: 'Pull', muscleGroup: 'Back' },
+            { name: 'Cable Row', category: 'Pull', muscleGroup: 'Back' },
+            { name: 'Face Pulls', category: 'Pull', muscleGroup: 'Back' },
+            { name: 'Bicep Curl', category: 'Pull', muscleGroup: 'Biceps' },
+            { name: 'Hammer Curl', category: 'Pull', muscleGroup: 'Biceps' },
+            { name: 'Preacher Curl', category: 'Pull', muscleGroup: 'Biceps' },
+            
+            // Legs
+            { name: 'Squat', category: 'Legs', muscleGroup: 'Quads' },
+            { name: 'Front Squat', category: 'Legs', muscleGroup: 'Quads' },
+            { name: 'Leg Press', category: 'Legs', muscleGroup: 'Quads' },
+            { name: 'Leg Extension', category: 'Legs', muscleGroup: 'Quads' },
+            { name: 'Romanian Deadlift', category: 'Legs', muscleGroup: 'Hamstrings' },
+            { name: 'Leg Curl', category: 'Legs', muscleGroup: 'Hamstrings' },
+            { name: 'Lunges', category: 'Legs', muscleGroup: 'Quads' },
+            { name: 'Bulgarian Split Squat', category: 'Legs', muscleGroup: 'Quads' },
+            { name: 'Calf Raise', category: 'Legs', muscleGroup: 'Calves' },
+            
+            // Core
+            { name: 'Plank', category: 'Core', muscleGroup: 'Abs' },
+            { name: 'Crunches', category: 'Core', muscleGroup: 'Abs' },
+            { name: 'Leg Raises', category: 'Core', muscleGroup: 'Abs' },
+            { name: 'Russian Twists', category: 'Core', muscleGroup: 'Abs' },
+            { name: 'Cable Crunches', category: 'Core', muscleGroup: 'Abs' },
+        ];
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    db = request.result;
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const database = event.target.result;
+
+                    if (!database.objectStoreNames.contains('workouts')) {
+                        database.createObjectStore('workouts', { keyPath: 'id', autoIncrement: true });
+                    }
+                    if (!database.objectStoreNames.contains('exercises')) {
+                        const exerciseStore = database.createObjectStore('exercises', { keyPath: 'id', autoIncrement: true });
+                        exerciseStore.createIndex('category', 'category', { unique: false });
+                    }
+                };
+            });
+        }
+
+        // Database operations
+        async function getAllWorkouts() {
+            const transaction = db.transaction('workouts', 'readonly');
+            const store = transaction.objectStore('workouts');
+            return new Promise((resolve, reject) => {
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result.reverse());
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function getAllExercises() {
+            const transaction = db.transaction('exercises', 'readonly');
+            const store = transaction.objectStore('exercises');
+            return new Promise((resolve, reject) => {
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function addWorkout(workout) {
+            const transaction = db.transaction('workouts', 'readwrite');
+            const store = transaction.objectStore('workouts');
+            return new Promise((resolve, reject) => {
+                const request = store.add(workout);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function deleteWorkout(id) {
+            const transaction = db.transaction('workouts', 'readwrite');
+            const store = transaction.objectStore('workouts');
+            return new Promise((resolve, reject) => {
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function addExercise(exercise) {
+            const transaction = db.transaction('exercises', 'readwrite');
+            const store = transaction.objectStore('exercises');
+            return new Promise((resolve, reject) => {
+                const request = store.add(exercise);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        // Initialize default exercises
+        async function initializeDefaultExercises() {
+            const existingExercises = await getAllExercises();
+            if (existingExercises.length === 0) {
+                for (const exercise of DEFAULT_EXERCISES) {
+                    await addExercise(exercise);
+                }
+            }
+        }
+
+        // Load data
+        async function loadData() {
+            workouts = await getAllWorkouts();
+            exercises = await getAllExercises();
+            
+            // Load active workout from localStorage if exists
+            loadActiveWorkout();
+        }
+
+        // Auto-save active workout to localStorage
+        function saveActiveWorkout() {
+            if (activeWorkout) {
+                localStorage.setItem('activeWorkout', JSON.stringify(activeWorkout));
+                localStorage.setItem('workoutTimer', workoutTimer.toString());
+            }
+        }
+
+        // Load active workout from localStorage
+        function loadActiveWorkout() {
+            const saved = localStorage.getItem('activeWorkout');
+            const savedTimer = localStorage.getItem('workoutTimer');
+            
+            if (saved) {
+                activeWorkout = JSON.parse(saved);
+                if (savedTimer) {
+                    workoutTimer = parseInt(savedTimer);
+                }
+                // Restart timer if workout was in progress
+                if (activeWorkout) {
+                    startWorkoutTimer();
+                }
+            }
+        }
+
+        // Clear saved workout
+        function clearSavedWorkout() {
+            localStorage.removeItem('activeWorkout');
+            localStorage.removeItem('workoutTimer');
+        }
+
+        // Timer functions
+        function startWorkoutTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                workoutTimer++;
+                updateTimerDisplay();
+                
+                // Auto-save every 30 seconds
+                if (workoutTimer % 30 === 0) {
+                    saveActiveWorkout();
+                }
+            }, 1000);
+        }
+
+        function stopWorkoutTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function startRestTimer(seconds) {
+            restTimer = seconds;
+            isResting = true;
+            
+            if (restInterval) clearInterval(restInterval);
+            restInterval = setInterval(() => {
+                restTimer--;
+                updateRestDisplay();
+                
+                if (restTimer <= 0) {
+                    isResting = false;
+                    clearInterval(restInterval);
+                    renderCurrentTab();
+                }
+            }, 1000);
+            renderCurrentTab();
+        }
+
+        function updateTimerDisplay() {
+            const timerEl = document.querySelector('.session-time');
+            if (timerEl) {
+                timerEl.textContent = '⏱️ ' + formatTime(workoutTimer);
+            }
+        }
+
+        function updateRestDisplay() {
+            const restEl = document.querySelector('.timer-display');
+            if (restEl) {
+                restEl.textContent = 'Rest: ' + formatTime(restTimer);
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Workout functions
+        function startWorkout() {
+            activeWorkout = {
+                exercises: [],
+                startTime: new Date(),
+                date: new Date().toISOString()
+            };
+            workoutTimer = 0;
+            startWorkoutTimer();
+            saveActiveWorkout(); // Auto-save immediately
+            renderCurrentTab();
+        }
+
+        async function endWorkout() {
+            if (activeWorkout && activeWorkout.exercises.length > 0) {
+                const workout = {
+                    ...activeWorkout,
+                    endTime: new Date(),
+                    duration: workoutTimer
+                };
+                await addWorkout(workout);
+                await loadData();
+            }
+            activeWorkout = null;
+            workoutTimer = 0;
+            stopWorkoutTimer();
+            clearSavedWorkout(); // Clear saved state
+            renderCurrentTab();
+        }
+
+        function addExerciseToWorkout(exercise) {
+            if (!activeWorkout) return;
+            
+            activeWorkout.exercises.push({
+                ...exercise,
+                sets: []
+            });
+            
+            // Auto-save workout state
+            saveActiveWorkout();
+            renderCurrentTab();
+        }
+
+        // New helper function to select exercise from list
+        function selectExercise(index) {
+            const exercise = exercises[index];
+            addExerciseToWorkout(exercise);
+        }
+
+        function addSetToExercise(exerciseIndex, weight, reps) {
+            if (!activeWorkout) return;
+            
+            activeWorkout.exercises[exerciseIndex].sets.push({
+                weight: parseFloat(weight),
+                reps: parseInt(reps),
+                timestamp: new Date()
+            });
+            
+            // Auto-save after adding set
+            saveActiveWorkout();
+            startRestTimer(90);
+        }
+
+        // Calculate stats
+        function calculateStats() {
+            const totalWorkouts = workouts.length;
+            const totalVolume = workouts.reduce((sum, w) => {
+                return sum + (w.exercises?.reduce((eSum, e) => {
+                    return eSum + (e.sets?.reduce((sSum, s) => sSum + (s.weight * s.reps), 0) || 0);
+                }, 0) || 0);
+            }, 0);
+            const totalSets = workouts.reduce((sum, w) => {
+                return sum + (w.exercises?.reduce((eSum, e) => eSum + (e.sets?.length || 0), 0) || 0);
+            }, 0);
+
+            return { totalWorkouts, totalVolume, totalSets };
+        }
+
+        function getPersonalRecords() {
+            const prs = {};
+            workouts.forEach(workout => {
+                workout.exercises?.forEach(exercise => {
+                    exercise.sets?.forEach(set => {
+                        if (!prs[exercise.name] || set.weight > prs[exercise.name].weight) {
+                            prs[exercise.name] = {
+                                weight: set.weight,
+                                reps: set.reps,
+                                date: workout.date
+                            };
+                        }
+                    });
+                });
+            });
+            return Object.entries(prs).map(([name, data]) => ({ name, ...data }));
+        }
+
+        function getProgressData(exerciseName) {
+            const data = [];
+            workouts.forEach(workout => {
+                workout.exercises?.forEach(exercise => {
+                    if (exercise.name === exerciseName) {
+                        const maxWeight = Math.max(...(exercise.sets?.map(s => s.weight) || [0]));
+                        data.push({
+                            date: new Date(workout.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }),
+                            weight: maxWeight,
+                            timestamp: new Date(workout.date).getTime()
+                        });
+                    }
+                });
+            });
+            return data.sort((a, b) => a.timestamp - b.timestamp).slice(-10);
+        }
+
+        // Chart drawing
+        function drawChart(canvasId, data) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || !data || data.length === 0) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth * 2;
+            const height = canvas.height = 600;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Find min/max
+            const weights = data.map(d => d.weight);
+            const maxWeight = Math.max(...weights);
+            const minWeight = Math.min(...weights);
+            const range = maxWeight - minWeight || 1;
+            
+            const padding = 80;
+            const chartWidth = width - padding * 2;
+            const chartHeight = height - padding * 2;
+            
+            // Draw axes with glow
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(0, 240, 255, 0.5)';
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+            
+            // Draw grid with subtle glow
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = 'rgba(0, 240, 255, 0.2)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+            
+            // Draw gradient area under line
+            if (data.length > 1) {
+                const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+                gradient.addColorStop(0, 'rgba(0, 240, 255, 0.3)');
+                gradient.addColorStop(0.5, 'rgba(255, 0, 255, 0.2)');
+                gradient.addColorStop(1, 'rgba(0, 255, 136, 0.1)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                
+                data.forEach((point, i) => {
+                    const x = padding + (chartWidth / (data.length - 1)) * i;
+                    const y = height - padding - ((point.weight - minWeight) / range) * chartHeight;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                ctx.lineTo(width - padding, height - padding);
+                ctx.lineTo(padding, height - padding);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            // Draw line with neon glow
+            if (data.length > 1) {
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = 'rgba(0, 240, 255, 0.8)';
+                ctx.strokeStyle = '#00F0FF';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                
+                data.forEach((point, i) => {
+                    const x = padding + (chartWidth / (data.length - 1)) * i;
+                    const y = height - padding - ((point.weight - minWeight) / range) * chartHeight;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                ctx.stroke();
+            }
+            
+            // Draw points with glow
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = 'rgba(255, 0, 255, 0.8)';
+            data.forEach((point, i) => {
+                const x = padding + (chartWidth / (data.length > 1 ? data.length - 1 : 1)) * i;
+                const y = height - padding - ((point.weight - minWeight) / range) * chartHeight;
+                
+                // Outer glow
+                ctx.fillStyle = '#FF00FF';
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Inner core
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#00F0FF';
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Draw labels with glow
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(0, 240, 255, 0.5)';
+            ctx.fillStyle = '#E0E0FF';
+            ctx.font = 'bold 20px JetBrains Mono';
+            ctx.textAlign = 'center';
+            
+            data.forEach((point, i) => {
+                const x = padding + (chartWidth / (data.length > 1 ? data.length - 1 : 1)) * i;
+                ctx.fillText(point.date, x, height - padding + 40);
+            });
+            
+            // Y-axis labels with glow
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const value = minWeight + (range / 5) * (5 - i);
+                const y = padding + (chartHeight / 5) * i;
+                ctx.fillText(Math.round(value) + 'kg', padding - 20, y + 8);
+            }
+            
+            ctx.shadowBlur = 0;
+        }
+
+        // Render functions
+        function renderDashboard() {
+            const stats = calculateStats();
+            const recentWorkouts = workouts.slice(0, 3);
+            const hasSavedWorkout = localStorage.getItem('activeWorkout') && !activeWorkout;
+            
+            return `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.totalWorkouts}</div>
+                        <div class="stat-label">Workouts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${Math.round(stats.totalVolume).toLocaleString()}</div>
+                        <div class="stat-label">Total Volume (kg)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.totalSets}</div>
+                        <div class="stat-label">Total Sets</div>
+                    </div>
+                </div>
+
+                ${hasSavedWorkout ? `
+                    <div class="card" style="background: rgba(255, 213, 0, 0.15); border-color: var(--warning);">
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; color: var(--warning);">
+                                ⚠️ UNFINISHED WORKOUT DETECTED
+                            </div>
+                            <div style="font-size: 0.9rem; margin-bottom: 1rem;">
+                                You have an incomplete workout. Resume or discard it.
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-secondary" style="flex: 1;" onclick="loadActiveWorkout(); switchTab('workout');">Resume Workout</button>
+                                <button class="btn" style="flex: 1; background: var(--danger);" onclick="clearSavedWorkout(); renderCurrentTab();">Discard</button>
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${!activeWorkout && !hasSavedWorkout ? `
+                    <button class="btn" onclick="startWorkout()">Start New Workout</button>
+                ` : activeWorkout ? `
+                    <div class="card" style="background: var(--primary); color: var(--bg-dark);">
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem;">
+                                🔥 WORKOUT IN PROGRESS
+                            </div>
+                            <div style="font-size: 0.9rem;">
+                                ${activeWorkout.exercises.length} exercises logged
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="card">
+                    <div class="card-header">Recent Workouts</div>
+                    ${recentWorkouts.length === 0 ? `
+                        <div class="empty-state">
+                            <div class="empty-icon">🏋️</div>
+                            <div>No workouts yet. Start your first session!</div>
+                        </div>
+                    ` : `
+                        <div class="history-exercises">
+                            ${recentWorkouts.map(workout => `
+                                <div class="history-item">
+                                    <div class="history-header">
+                                        <div>
+                                            <div style="font-size: 0.9rem; color: var(--text-dim);">
+                                                ${new Date(workout.date).toLocaleDateString('en-GB', {
+                                                    weekday: 'short',
+                                                    day: 'numeric',
+                                                    month: 'short'
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 0.85rem; margin-top: 0.5rem;">
+                                        ${workout.exercises?.length || 0} exercises • ${workout.exercises?.reduce((sum, e) => sum + (e.sets?.length || 0), 0) || 0} sets
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function renderWorkout() {
+            if (!activeWorkout) {
+                return `
+                    <div class="empty-state">
+                        <div class="empty-icon">💪</div>
+                        <div style="margin-bottom: 1rem;">Ready to train?</div>
+                        <button class="btn" onclick="startWorkout()">Start Workout</button>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="workout-session">
+                    <div class="session-header">
+                        <div class="session-time">⏱️ ${formatTime(workoutTimer)}</div>
+                        <button class="btn btn-small btn-secondary" onclick="endWorkout()">Finish Workout</button>
+                    </div>
+                </div>
+
+                ${isResting ? `
+                    <div class="timer-display active">Rest: ${formatTime(restTimer)}</div>
+                ` : ''}
+
+                <button class="btn btn-secondary" onclick="toggleExerciseList()">
+                    <span id="exercise-list-toggle">+ Add Exercise</span>
+                </button>
+
+                <div id="exercise-list-container" class="hidden">
+                    <div class="card">
+                        <input type="text" id="exercise-search" placeholder="Search exercises..." class="search-box" onkeyup="filterExercises()">
+                        
+                        <div class="category-filter">
+                            ${['All', 'Push', 'Pull', 'Legs', 'Core'].map(cat => `
+                                <button class="category-chip ${cat === 'All' ? 'active' : ''}" onclick="filterByCategory('${cat}')">${cat}</button>
+                            `).join('')}
+                        </div>
+
+                        <div class="exercise-list" id="exercise-list">
+                            ${exercises.map((ex, idx) => `
+                                <div class="exercise-item" data-category="${ex.category}" data-name="${ex.name.toLowerCase()}" onclick="selectExercise(${idx})">
+                                    <div>
+                                        <div class="exercise-name">${ex.name}</div>
+                                        <div class="exercise-category">${ex.muscleGroup}</div>
+                                    </div>
+                                    <div style="color: var(--primary);">+</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                ${activeWorkout.exercises.map((exercise, exIdx) => `
+                    <div class="card">
+                        <div class="card-header">${exercise.name}</div>
+                        
+                        ${exercise.sets.map((set, setIdx) => `
+                            <div class="history-exercise">
+                                Set ${setIdx + 1}: ${set.weight}kg × ${set.reps} reps
+                            </div>
+                        `).join('')}
+
+                        <div class="set-entry">
+                            <input type="number" id="weight-${exIdx}" placeholder="Weight (kg)" step="2.5" min="0" class="set-input">
+                            <input type="number" id="reps-${exIdx}" placeholder="Reps" min="1" class="set-input">
+                            <button class="btn btn-small" onclick="logSet(${exIdx})">Log</button>
+                        </div>
+                    </div>
+                `).join('')}
+
+                ${activeWorkout.exercises.length === 0 ? `
+                    <div class="empty-state">
+                        <div>Add exercises to start logging sets</div>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function renderHistory() {
+            if (workouts.length === 0) {
+                return `
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <div>No workout history yet</div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="card">
+                    <div class="card-header">Workout History</div>
+                    ${workouts.map(workout => `
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div>
+                                    <div class="history-title">
+                                        ${new Date(workout.date).toLocaleDateString('en-GB', {
+                                            weekday: 'long',
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric'
+                                        })}
+                                    </div>
+                                    <div class="history-date">
+                                        Duration: ${formatTime(workout.duration || 0)}
+                                    </div>
+                                </div>
+                                <button class="btn btn-small" style="background: var(--danger);" onclick="confirmDeleteWorkout(${workout.id})">
+                                    Delete
+                                </button>
+                            </div>
+                            
+                            <div class="history-exercises">
+                                ${workout.exercises?.map(exercise => `
+                                    <div class="history-exercise">
+                                        <strong>${exercise.name}</strong>
+                                        <div style="font-size: 0.85rem; margin-top: 0.25rem;">
+                                            ${exercise.sets?.map((set, sIdx) => `
+                                                <div>Set ${sIdx + 1}: ${set.weight}kg × ${set.reps}</div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderProgress() {
+            const prs = getPersonalRecords();
+
+            return `
+                <div class="card">
+                    <div class="card-header">Personal Records</div>
+                    ${prs.length === 0 ? `
+                        <div class="empty-state">
+                            <div>Complete workouts to see your PRs</div>
+                        </div>
+                    ` : `
+                        <div class="pr-list">
+                            ${prs.map(pr => `
+                                <div class="pr-item">
+                                    <div>
+                                        <div class="pr-exercise">${pr.name}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-dim);">
+                                            ${pr.reps} reps • ${new Date(pr.date).toLocaleDateString('en-GB')}
+                                        </div>
+                                    </div>
+                                    <div class="pr-weight">${pr.weight}kg</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `}
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Exercise Progress</div>
+                    <select id="exercise-select" onchange="updateChart()" style="margin-bottom: 1rem;">
+                        <option value="">Select an exercise</option>
+                        ${exercises.map(ex => `
+                            <option value="${ex.name}">${ex.name}</option>
+                        `).join('')}
+                    </select>
+
+                    <div class="chart-container">
+                        <canvas id="progress-chart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        // UI interaction functions
+        function toggleExerciseList() {
+            const container = document.getElementById('exercise-list-container');
+            const toggle = document.getElementById('exercise-list-toggle');
+            
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                toggle.textContent = '− Hide Exercises';
+            } else {
+                container.classList.add('hidden');
+                toggle.textContent = '+ Add Exercise';
+            }
+        }
+
+        function filterExercises() {
+            const search = document.getElementById('exercise-search').value.toLowerCase();
+            const items = document.querySelectorAll('.exercise-item');
+            
+            items.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(search)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function filterByCategory(category) {
+            const items = document.querySelectorAll('.exercise-item');
+            const chips = document.querySelectorAll('.category-chip');
+            
+            chips.forEach(chip => {
+                if (chip.textContent === category) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+            
+            items.forEach(item => {
+                const itemCategory = item.getAttribute('data-category');
+                if (category === 'All' || itemCategory === category) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function logSet(exerciseIndex) {
+            const weight = document.getElementById(`weight-${exerciseIndex}`).value;
+            const reps = document.getElementById(`reps-${exerciseIndex}`).value;
+            
+            if (weight && reps) {
+                addSetToExercise(exerciseIndex, weight, reps);
+                renderCurrentTab();
+            }
+        }
+
+        async function confirmDeleteWorkout(id) {
+            if (confirm('Delete this workout?')) {
+                await deleteWorkout(id);
+                await loadData();
+                renderCurrentTab();
+            }
+        }
+
+        function updateChart() {
+            const select = document.getElementById('exercise-select');
+            const exerciseName = select.value;
+            
+            if (exerciseName) {
+                const data = getProgressData(exerciseName);
+                setTimeout(() => drawChart('progress-chart', data), 100);
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            activeTab = tabName;
+            
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                if (item.getAttribute('data-tab') === tabName) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            renderCurrentTab();
+        }
+
+        function renderCurrentTab() {
+            const content = document.getElementById('content');
+            content.classList.add('fade-in');
+            
+            switch(activeTab) {
+                case 'dashboard':
+                    content.innerHTML = renderDashboard();
+                    break;
+                case 'workout':
+                    content.innerHTML = renderWorkout();
+                    break;
+                case 'history':
+                    content.innerHTML = renderHistory();
+                    break;
+                case 'progress':
+                    content.innerHTML = renderProgress();
+                    break;
+            }
+            
+            setTimeout(() => content.classList.remove('fade-in'), 300);
+        }
+
+        // Event listeners
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                switchTab(item.getAttribute('data-tab'));
+            });
+        });
+
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'iron-track-v1';
+                    
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => {
+                                return cache.addAll(['/']);
+                            })
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', (event) => {
+                        event.respondWith(
+                            caches.match(event.request).then((response) => {
+                                return response || fetch(event.request);
+                            })
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl).catch(() => {});
+            });
+        }
+
+        // Initialize app
+        (async () => {
+            await initDB();
+            await initializeDefaultExercises();
+            await loadData();
+            renderCurrentTab();
+        })();
+    </script>
+</body>
+</html>
